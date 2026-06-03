@@ -1,8 +1,5 @@
 import type { Board, Cell, Move, Player } from './types';
 
-/** Player order in the bitboard: X occupies index 0, O index 1. */
-export const PLAYERS: readonly Player[] = ['X', 'O'];
-
 const FULL = 0b111111111; // 511 — all 9 cells occupied
 
 export const playerIndex = (p: Player): number => (p === 'X' ? 0 : 1);

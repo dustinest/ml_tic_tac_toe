@@ -67,6 +67,38 @@ export const strings = {
     } as Record<string, string>,
   },
 
+  tagline: 'a perfect solver vs. a machine that learns from scratch',
+
+  descriptions: {
+    board: {
+      mh:
+        'You against minimax — a solver that looks ahead through every possible ' +
+        'continuation and never errs. It cannot be beaten. The best you can force is a draw.',
+      mlh:
+        'You against the Q-learning agent. Each finished game becomes training data: ' +
+        'it shifts its value estimates toward the moves that worked. Teaching by hand is ' +
+        'slow, though — for real progress, train it in mode 3.',
+      mmml:
+        'Train the agent against a perfect minimax opponent. «Train» runs hundreds of ' +
+        'games instantly and feeds every result back into the table; «Play 1» steps through ' +
+        'a single game so you can watch what it has learned.',
+      mlml:
+        'The agent plays itself — one shared brain on both sides of the board. «Train» piles ' +
+        'up self-play experience fast; «Play 1» shows a single game at human speed.',
+    } as Record<string, string>,
+    learning:
+      'After every game the win / draw / loss share over the last 100 games is plotted here. ' +
+      'The line is the whole point: it tells you whether the agent is genuinely getting better, ' +
+      'or just churning. Read the note under the chart for what «better» means in this mode.',
+    inspector:
+      'Each tile is one board position the agent has actually seen, drawn from its own ' +
+      'point of view: <span style="color:var(--me)">■ its mark</span>, ' +
+      '<span style="color:var(--opp)">■ the opponent</span>. Empty squares show the learned ' +
+      '<b>Q-value</b> — its estimate of how good moving there is. A ' +
+      '<span style="color:var(--win)">green outline</span> marks the move it currently prefers. ' +
+      'Tiles are sorted by how often the position has come up.',
+  },
+
   agentMeta: (states: number, games: number) => `agent: ${states} states · ${games} games`,
 
   chart: {

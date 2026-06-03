@@ -19,6 +19,8 @@ export function startApp(): void {
   const els = {
     board: $('board'), status: $('status'), controls: $('controls'),
     boardTitle: $('boardtitle'), starterToggle: $('startertoggle'),
+    tagline: $('tagline'), boardDesc: $('boarddesc'),
+    learnDesc: $('learndesc'), inspDesc: $('inspdesc'),
     metricNote: $('metricnote'), metricExplain: $('metricexplain'),
     inspector: $('inspector'), exportBox: $('exportbox') as unknown as HTMLTextAreaElement,
     chart: $('chart') as unknown as HTMLCanvasElement,
@@ -180,6 +182,7 @@ export function startApp(): void {
   // ---- mode setup ----
   function setupMode(): void {
     els.boardTitle.textContent = strings.modeTitles[s.mode];
+    els.boardDesc.textContent = strings.descriptions.board[s.mode];
     els.starterToggle.classList.toggle('hidden', !s.isHumanMode());
     buildControls(els.controls, s.isHumanMode(), {
       train, watch, newGame, resetTraining,
@@ -196,19 +199,30 @@ export function startApp(): void {
   }
 
   // ---- static wiring ----
-  document.querySelectorAll<HTMLButtonElement>('.modes button').forEach((b) => {
+  // The active button is derived from state, never stored in the markup, so
+  // AppState (mode / humanStarts) stays the single source of truth.
+  const modeButtons = document.querySelectorAll<HTMLButtonElement>('.modes button');
+  const starterButtons = els.starterToggle.querySelectorAll<HTMLButtonElement>('button');
+
+  function syncModeButtons(): void {
+    modeButtons.forEach((b) => b.classList.toggle('on', b.dataset.mode === s.mode));
+  }
+  function syncStarterButtons(): void {
+    starterButtons.forEach((b) =>
+      b.classList.toggle('on', (b.dataset.start === 'human') === s.humanStarts));
+  }
+
+  modeButtons.forEach((b) => {
     b.addEventListener('click', () => {
-      document.querySelectorAll('.modes button').forEach((x) => x.classList.remove('on'));
-      b.classList.add('on');
       s.mode = b.dataset.mode as Mode;
+      syncModeButtons();
       setupMode();
     });
   });
-  els.starterToggle.querySelectorAll<HTMLButtonElement>('button').forEach((b) => {
+  starterButtons.forEach((b) => {
     b.addEventListener('click', () => {
-      els.starterToggle.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
-      b.classList.add('on');
       s.humanStarts = b.dataset.start === 'human';
+      syncStarterButtons();
       newGame();
     });
   });
@@ -225,6 +239,11 @@ export function startApp(): void {
   };
 
   // ---- init ----
+  els.tagline.textContent = strings.tagline;
+  els.learnDesc.textContent = strings.descriptions.learning;
+  els.inspDesc.innerHTML = strings.descriptions.inspector;
+  syncModeButtons();
+  syncStarterButtons();
   setupMode();
   refreshAll();
 }

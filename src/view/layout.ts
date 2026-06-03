@@ -37,7 +37,9 @@ const modeButtons = L.modeButtons
   .map((b) => {
     const aria = `${L.actors[b.a]} vs ${L.actors[b.b]}${b.learns ? `, ${L.learnsTag}` : ''}`;
     return `<button role="tab" aria-selected="false" data-mode="${b.mode}" aria-label="${aria}">` +
-      `<span class="matchup">${icon(b.a)}<span class="vs">/</span>${icon(b.b)}</span></button>`;
+      `<span class="matchup">${icon(b.a)}<span class="vs">|</span>${icon(b.b)}</span>` +
+      `<span class="modelabel">${L.actorCodes[b.a]}<span class="vs-t">vs</span>${L.actorCodes[b.b]}</span>` +
+      `</button>`;
   })
   .join('\n    ');
 

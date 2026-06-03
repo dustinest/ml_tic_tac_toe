@@ -11,6 +11,8 @@ export const strings = {
     // Actor names — used to build each mode button's aria-label (icons carry
     // the meaning visually; the game panel's title spells out the matchup).
     actors: { human: 'Human', minimax: 'minimax', ml: 'ML' } as Record<string, string>,
+    // Short all-caps codes shown under each mode button's icons.
+    actorCodes: { human: 'YOU', minimax: 'MMX', ml: 'ML' } as Record<string, string>,
     learnsTag: 'learns',
     learnLine: 'Learning',
     // Each mode is a matchup between two actors; the menu shows their icons,

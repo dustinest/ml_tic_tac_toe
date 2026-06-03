@@ -27,11 +27,12 @@ export const strings = {
       learning: 'Learning curve',
       memory: 'What the agent has learned',
     },
+    starterLegend: 'Who plays first',
     starter: { human: 'You start', cpu: 'Computer starts' },
     stats: { wins: 'Wins', draws: 'Draws', losses: 'Losses' },
     meta: { games: 'Training games', states: 'States learned', coverage: 'Q-coverage' },
     legend: { loss: 'loss %', draw: 'draw %', win: 'win %', window: 'window: last 100 games' },
-    actions: { inspect: 'Show states', export: 'Export JSON' },
+    actions: { inspect: 'Show states', export: 'Export JSON', copy: 'Copy', copied: 'Copied!' },
     // The no-JavaScript fallback necessarily lives as static markup in
     // index.html (JS can't render the page that exists when JS is off).
   },
@@ -69,8 +70,6 @@ export const strings = {
 
   inspector: {
     empty: 'Table is empty. Train first.',
-    show: 'Show states',
-    hide: 'Hide states',
     capped: (cap: number, total: number) =>
       `Showing ${cap} most-visited states of ${total}. Full table: «Export JSON».`,
   },

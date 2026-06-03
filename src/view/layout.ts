@@ -24,6 +24,10 @@ const ICON_DEFS =
   '<g id="i-learns" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
   '<path d="M8 3 14.5 5.6 8 8.2 1.5 5.6 Z"/><path d="M4.6 6.9v3c0 1.1 1.5 1.9 3.4 1.9s3.4-.8 3.4-1.9v-3"/>' +
   '<path d="M14.5 5.6v3.4"/></g>' +
+  // overlapping sheets — copy to clipboard
+  '<g id="i-copy" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+  '<rect x="6" y="6" width="7.5" height="7.5" rx="1.4"/>' +
+  '<path d="M3.4 10H2.9A1.4 1.4 0 0 1 1.5 8.6V2.9A1.4 1.4 0 0 1 2.9 1.5H8.6A1.4 1.4 0 0 1 10 2.9V3.4"/></g>' +
   '</defs></svg>';
 
 const icon = (kind: string) =>
@@ -32,7 +36,7 @@ const icon = (kind: string) =>
 const modeButtons = L.modeButtons
   .map((b) => {
     const aria = `${L.actors[b.a]} vs ${L.actors[b.b]}${b.learns ? `, ${L.learnsTag}` : ''}`;
-    return `<button data-mode="${b.mode}" aria-label="${aria}">` +
+    return `<button role="tab" aria-selected="false" data-mode="${b.mode}" aria-label="${aria}">` +
       `<span class="matchup">${icon(b.a)}<span class="vs">/</span>${icon(b.b)}</span></button>`;
   })
   .join('\n    ');
@@ -59,70 +63,80 @@ export function renderLayout(root: HTMLElement): void {
   </header>
 
   <div class="grid">
-    <div class="playcol">
+    <main class="playcol">
       <div class="modes" role="tablist">
         ${modeButtons}
       </div>
-      <div class="panel panel--board">
-      <div class="phead">
+      <section class="panel panel--board" role="tabpanel" aria-label="${L.panelTitles.board}">
+      <header class="phead">
         <span class="kicker"><b>01</b> ${L.kickers.play}</span>
         <h2 id="boardtitle">${L.panelTitles.board}</h2>
-      </div>
+      </header>
       <div class="panel-desc">
         <span class="learnline hidden" id="learnline">${icon('learns')}<span>${L.learnLine}</span></span>
         <span id="boarddesc"></span>
       </div>
-      <div class="toggle hidden" id="startertoggle">
-        <button data-start="human">${L.starter.human}</button>
-        <button data-start="cpu">${L.starter.cpu}</button>
-      </div>
+      <fieldset class="toggle hidden" id="startertoggle" role="radiogroup">
+        <legend class="vh">${L.starterLegend}</legend>
+        <button type="button" role="radio" aria-checked="false" data-start="human">${L.starter.human}</button>
+        <button type="button" role="radio" aria-checked="false" data-start="cpu">${L.starter.cpu}</button>
+      </fieldset>
       <div class="board" id="board"></div>
-      <div class="status" id="status"></div>
-      <div class="btnrow" id="controls"></div>
-      </div>
-    </div>
+      <output class="status" id="status"></output>
+      <div class="btnrow" id="controls" role="toolbar"></div>
+      </section>
+    </main>
 
-    <div class="rail">
-      <div class="panel">
-        <div class="phead">
+    <aside class="rail">
+      <section class="panel">
+        <header class="phead">
           <span class="kicker"><b>02</b> ${L.kickers.result}</span>
           <h2>${L.panelTitles.learning} <span class="sub" id="metricnote"></span></h2>
-        </div>
+        </header>
         <p class="panel-desc" id="learndesc"></p>
-        <div class="stats">
-          <div class="stat win"><div class="v" id="sWin">0%</div><div class="l">${L.stats.wins}</div></div>
-          <div class="stat draw"><div class="v" id="sDraw">0%</div><div class="l">${L.stats.draws}</div></div>
-          <div class="stat loss"><div class="v" id="sLoss">0%</div><div class="l">${L.stats.losses}</div></div>
-        </div>
-        <div class="meta">
-          <span>${L.meta.games} <b id="mGames">0</b></span>
-          <span>${L.meta.states} <b id="mStates">0</b></span>
-          <span>${L.meta.coverage} <b id="mFill">0</b></span>
-        </div>
-        <div class="chartwrap"><canvas id="chart" width="640" height="220"></canvas></div>
-        <div class="legend">
-          <span><i style="background:var(--loss)"></i>${L.legend.loss}</span>
-          <span><i style="background:var(--draw)"></i>${L.legend.draw}</span>
-          <span><i style="background:var(--win)"></i>${L.legend.win}</span>
-          <span class="legend-dim">${L.legend.window}</span>
-        </div>
-        <div class="note" id="metricexplain"></div>
-      </div>
+        <ul class="stats">
+          <li class="stat win"><span class="percent" id="sWin">0%</span><span class="label">${L.stats.wins}</span></li>
+          <li class="stat draw"><span class="percent" id="sDraw">0%</span><span class="label">${L.stats.draws}</span></li>
+          <li class="stat loss"><span class="percent" id="sLoss">0%</span><span class="label">${L.stats.losses}</span></li>
+        </ul>
+        <ul class="meta">
+          <li><span class="label">${L.meta.games}</span> <span class="value" id="mGames">0</span></li>
+          <li><span class="label">${L.meta.states}</span> <span class="value" id="mStates">0</span></li>
+          <li><span class="label">${L.meta.coverage}</span> <span class="value" id="mFill">0</span></li>
+        </ul>
+        <figure class="chartwrap">
+          <canvas id="chart" width="640" height="220"></canvas>
+          <figcaption class="legend">
+            <ul>
+              <li><i style="background:var(--loss)"></i>${L.legend.loss}</li>
+              <li><i style="background:var(--draw)"></i>${L.legend.draw}</li>
+              <li><i style="background:var(--win)"></i>${L.legend.win}</li>
+              <li class="legend-dim">${L.legend.window}</li>
+            </ul>
+          </figcaption>
+        </figure>
+        <p class="note" id="metricexplain"></p>
+      </section>
 
-      <div class="panel">
-        <div class="phead">
+      <section class="panel">
+        <header class="phead">
           <span class="kicker"><b>03</b> ${L.kickers.memory}</span>
           <h2>${L.panelTitles.memory}</h2>
-          <span class="headacts">
-            <button class="act" id="btnInspect">${L.actions.inspect}</button>
-            <button class="act" id="btnExport">${L.actions.export}</button>
-          </span>
-        </div>
+        </header>
         <p class="panel-desc" id="inspdesc"></p>
-        <div class="insp hidden" id="inspector"></div>
-        <textarea id="exportbox" readonly></textarea>
-      </div>
-    </div>
+        <details id="inspectorpanel">
+          <summary>${L.actions.inspect}</summary>
+          <div class="insp" id="inspector"></div>
+        </details>
+        <details id="exportpanel">
+          <summary>${L.actions.export}</summary>
+          <div class="copyrow">
+            <button class="copybtn" id="btnCopy" type="button">${icon('copy')}<span class="copylabel">${L.actions.copy}</span></button>
+          </div>
+          <textarea id="exportbox" readonly></textarea>
+        </details>
+      </section>
+    </aside>
   </div>
 
   <footer class="colophon">

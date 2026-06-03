@@ -159,7 +159,6 @@ h1 .dot{color:var(--accent);margin:0 -.04em}
   color:var(--ink);line-height:.95;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
 }
 .panel h2 .sub{font-family:'Space Mono',monospace;font-size:10px;font-weight:400}
-.headacts{margin-left:auto;display:flex;gap:8px}
 .panel-desc{
   font-size:11.5px;line-height:1.65;color:var(--muted);
   border-left:3px solid var(--accent);padding-left:11px;margin-bottom:16px;
@@ -189,7 +188,7 @@ h1 .dot{color:var(--accent);margin:0 -.04em}
 /* opaque tints — these sit over the black board, so transparency would darken them */
 .cell.wincell{background:#cfe8d6;box-shadow:inset 0 0 0 3px var(--win)}
 .status{
-  text-align:center;font-size:13px;min-height:22px;margin-bottom:14px;
+  display:block;text-align:center;font-size:13px;min-height:22px;margin-bottom:14px;
   letter-spacing:.4px;font-weight:700;color:var(--ink);
 }
 .status .X{color:var(--me)}
@@ -210,12 +209,13 @@ button.act.primary{background:var(--accent);border-color:var(--ink)}
 button.act.primary:hover{background:#ffc83a}
 button.act.danger:hover{background:var(--loss);color:var(--paper)}
 button.act:disabled{opacity:.4;cursor:not-allowed;box-shadow:var(--shadow-sm);transform:none}
-.headacts .act{flex:none;padding:6px 11px;font-size:11px;box-shadow:2px 2px 0 var(--ink)}
-.headacts .act:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
 
 /* starter toggle */
-.toggle{display:flex;gap:0;border:2.5px solid var(--ink);box-shadow:var(--shadow-sm);
-  margin-bottom:14px;font-size:11px}
+.toggle{display:flex;gap:0;min-inline-size:0;padding:0;
+  border:2.5px solid var(--ink);box-shadow:var(--shadow-sm);
+  margin:0 0 14px;font-size:11px}
+.vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .toggle button{flex:1;background:var(--paper);color:var(--muted);border:none;
   border-right:2.5px solid var(--ink);padding:9px;cursor:pointer;
   font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.3px}
@@ -223,29 +223,31 @@ button.act:disabled{opacity:.4;cursor:not-allowed;box-shadow:var(--shadow-sm);tr
 .toggle button.on{background:var(--accent);color:var(--ink)}
 
 /* ---------- stats ---------- */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:18px;
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+  list-style:none;margin:0 0 18px;padding:0;
   border:2.5px solid var(--ink);box-shadow:var(--shadow-sm)}
 .stat{background:var(--panel2);border-right:2.5px solid var(--ink);padding:14px 12px}
 .stat:last-child{border-right:none}
-.stat .v{font-family:'Big Shoulders Display',sans-serif;font-size:40px;font-weight:900;line-height:.85}
-.stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:7px}
+.stat .percent{display:block;font-family:'Big Shoulders Display',sans-serif;font-size:40px;font-weight:900;line-height:.85}
+.stat .label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:7px}
 .stat.win{background:rgba(31,143,78,.10)}
 .stat.draw{background:rgba(224,154,19,.12)}
 .stat.loss{background:rgba(224,51,27,.10)}
-.stat.win .v{color:var(--win)}
-.stat.draw .v{color:var(--draw)}
-.stat.loss .v{color:var(--loss)}
+.stat.win .percent{color:var(--win)}
+.stat.draw .percent{color:var(--draw)}
+.stat.loss .percent{color:var(--loss)}
 
 .meta{display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:var(--muted);
-  margin-bottom:18px;text-transform:uppercase;letter-spacing:.6px}
-.meta b{font-family:'Big Shoulders Display',sans-serif;font-size:16px;font-weight:800;
+  list-style:none;margin:0 0 18px;padding:0;text-transform:uppercase;letter-spacing:.6px}
+.meta .value{font-family:'Big Shoulders Display',sans-serif;font-size:16px;font-weight:800;
   color:var(--ink);margin-left:6px;letter-spacing:.3px}
 
 /* ---------- chart ---------- */
-.chartwrap{border:2.5px solid var(--ink);box-shadow:var(--shadow-sm);background:var(--panel2);padding:2px}
+.chartwrap{margin:0;border:2.5px solid var(--ink);box-shadow:var(--shadow-sm);background:var(--panel2);padding:2px}
 canvas{width:100%;max-width:100%;height:auto;display:block;background:transparent}
-.legend{display:flex;gap:18px;font-size:10.5px;margin-top:12px;color:var(--muted);
-  flex-wrap:wrap;text-transform:uppercase;letter-spacing:.7px}
+.legend{margin-top:12px}
+.legend ul{display:flex;gap:18px;flex-wrap:wrap;list-style:none;margin:0;padding:0;
+  font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .legend i{display:inline-block;width:20px;height:4px;margin-right:7px;vertical-align:middle}
 .legend-dim{color:var(--dim)}
 
@@ -276,8 +278,18 @@ textarea{
   width:100%;height:170px;background:var(--ink);color:#f0e9d8;
   border:2.5px solid var(--ink);box-shadow:var(--shadow-sm);
   padding:12px;font-family:'Space Mono',monospace;font-size:11px;line-height:1.5;
-  margin-top:14px;resize:vertical;display:none;
+  margin-top:14px;resize:vertical;
 }
+.copyrow{display:flex;justify-content:flex-end;margin-top:14px}
+.copybtn{display:inline-flex;align-items:center;gap:6px;
+  background:var(--paper);color:var(--ink);
+  border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink);
+  padding:6px 11px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.4px;cursor:pointer;transition:transform .1s,box-shadow .1s,background .12s,color .12s}
+.copybtn:hover{background:var(--panel2)}
+.copybtn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+.copybtn.copied{background:var(--win);color:var(--paper);border-color:var(--win)}
+.copybtn .ico{width:13px;height:13px}
 
 /* ---------- colophon ---------- */
 .colophon{margin-top:30px;border-top:3px solid var(--ink);padding-top:14px;

@@ -20,6 +20,10 @@ const ICON_DEFS =
   '<g fill="currentColor"><circle cx="8" cy="3.6" r="2"/><circle cx="4.4" cy="10.6" r="2"/><circle cx="11.6" cy="10.6" r="2"/></g></g>' +
   '<g id="i-ml" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
   '<path d="M2.4 13 6 9.2 8.6 10.9 13.4 4"/><path d="M10.3 4 13.6 4 13.6 7.3"/></g>' +
+  // graduation cap — marks a mode that trains (the ML "learns")
+  '<g id="i-learns" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+  '<path d="M8 3 14.5 5.6 8 8.2 1.5 5.6 Z"/><path d="M4.6 6.9v3c0 1.1 1.5 1.9 3.4 1.9s3.4-.8 3.4-1.9v-3"/>' +
+  '<path d="M14.5 5.6v3.4"/></g>' +
   '</defs></svg>';
 
 const icon = (kind: string) =>
@@ -27,20 +31,12 @@ const icon = (kind: string) =>
 
 const modeButtons = L.modeButtons
   .map((b) => {
-    const aria = `${L.actors[b.a]} vs ${L.actors[b.b]}${b.learns ? ', learns' : ''}`;
-    const tag = b.learns ? `<em class="tag">${L.learnsTag}</em>` : '';
+    const aria = `${L.actors[b.a]} vs ${L.actors[b.b]}${b.learns ? `, ${L.learnsTag}` : ''}`;
     return `<button data-mode="${b.mode}" aria-label="${aria}">` +
-      `<span class="n">${b.n}</span>${icon(b.a)}<span class="vs">vs</span>${icon(b.b)}${tag}</button>`;
+      `<span class="matchup">${icon(b.a)}<span class="vs">/</span>${icon(b.b)}</span></button>`;
   })
   .join('\n    ');
 
-const actorsLegend =
-  `<div class="actors-legend">
-    <span class="al-label">${L.actorsLabel}</span>
-    <span class="actor">${icon('human')} ${L.actors.human}</span>
-    <span class="actor">${icon('minimax')} ${L.actors.minimax}</span>
-    <span class="actor">${icon('ml')} ${L.actors.ml}</span>
-  </div>`;
 
 /**
  * Build the entire app markup from i18n copy and inject it into `root`.
@@ -62,19 +58,20 @@ export function renderLayout(root: HTMLElement): void {
     <div class="meterchip"><span class="sub" id="agentmeta">${L.agentMetaSeed}</span></div>
   </header>
 
-  ${actorsLegend}
-
-  <div class="modes" role="tablist">
-    ${modeButtons}
-  </div>
-
   <div class="grid">
-    <div class="panel panel--board">
+    <div class="playcol">
+      <div class="modes" role="tablist">
+        ${modeButtons}
+      </div>
+      <div class="panel panel--board">
       <div class="phead">
         <span class="kicker"><b>01</b> ${L.kickers.play}</span>
         <h2 id="boardtitle">${L.panelTitles.board}</h2>
       </div>
-      <p class="panel-desc" id="boarddesc"></p>
+      <div class="panel-desc">
+        <span class="learnline hidden" id="learnline">${icon('learns')}<span>${L.learnLine}</span></span>
+        <span id="boarddesc"></span>
+      </div>
       <div class="toggle hidden" id="startertoggle">
         <button data-start="human">${L.starter.human}</button>
         <button data-start="cpu">${L.starter.cpu}</button>
@@ -82,6 +79,7 @@ export function renderLayout(root: HTMLElement): void {
       <div class="board" id="board"></div>
       <div class="status" id="status"></div>
       <div class="btnrow" id="controls"></div>
+      </div>
     </div>
 
     <div class="rail">

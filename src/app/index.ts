@@ -23,7 +23,7 @@ export function startApp(): void {
   const els = {
     board: $('board'), status: $('status'), controls: $('controls'),
     boardTitle: $('boardtitle'), starterToggle: $('startertoggle'),
-    tagline: $('tagline'), boardDesc: $('boarddesc'),
+    tagline: $('tagline'), boardDesc: $('boarddesc'), learnLine: $('learnline'),
     learnDesc: $('learndesc'), inspDesc: $('inspdesc'),
     metricNote: $('metricnote'), metricExplain: $('metricexplain'),
     inspector: $('inspector'), exportBox: $('exportbox') as unknown as HTMLTextAreaElement,
@@ -187,6 +187,7 @@ export function startApp(): void {
   function setupMode(): void {
     els.boardTitle.textContent = strings.modeTitles[s.mode];
     els.boardDesc.textContent = strings.descriptions.board[s.mode];
+    els.learnLine.classList.toggle('hidden', s.mode === 'mh'); // every mode but pure minimax learns
     els.starterToggle.classList.toggle('hidden', !s.isHumanMode());
     buildControls(els.controls, s.isHumanMode(), {
       train, watch, newGame, resetTraining,

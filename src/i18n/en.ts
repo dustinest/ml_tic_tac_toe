@@ -8,16 +8,18 @@ export const strings = {
   layout: {
     title: 'tic-tac-toe // a perfect solver vs. a machine that learns',
     agentMetaSeed: 'agent: 0 states · 0 games',
-    // Legend for the actor icons used in the mode menu (human / minimax / ML).
-    actorsLabel: 'Players',
+    // Actor names — used to build each mode button's aria-label (icons carry
+    // the meaning visually; the game panel's title spells out the matchup).
     actors: { human: 'Human', minimax: 'minimax', ml: 'ML' } as Record<string, string>,
     learnsTag: 'learns',
-    // Each mode is a matchup between two actors; the menu shows their icons.
+    learnLine: 'Learning',
+    // Each mode is a matchup between two actors; the menu shows their icons,
+    // plus a graduation-cap badge when that mode trains the ML.
     modeButtons: [
-      { mode: 'mlh', n: '1', a: 'ml', b: 'human', learns: true },
-      { mode: 'mlml', n: '2', a: 'ml', b: 'ml', learns: true },
-      { mode: 'mmml', n: '3', a: 'minimax', b: 'ml', learns: true },
-      { mode: 'mh', n: '4', a: 'minimax', b: 'human', learns: false },
+      { mode: 'mlh', a: 'ml', b: 'human', learns: true },
+      { mode: 'mlml', a: 'ml', b: 'ml', learns: true },
+      { mode: 'mmml', a: 'minimax', b: 'ml', learns: true },
+      { mode: 'mh', a: 'minimax', b: 'human', learns: false },
     ],
     kickers: { play: 'Play', result: 'Result', memory: 'Memory' },
     panelTitles: {
@@ -93,7 +95,7 @@ export const strings = {
         'Same principle as AlphaZero, just with a tiny table.',
       mlh:
         'The ML learns from your games, but learning at human pace is slow and noisy. ' +
-        'For fast training use mode <b>3</b>. Here you mostly see whether what it learned transfers.',
+        'For fast training use the <b>ML vs ML</b> mode. Here you mostly see whether what it learned transfers.',
       mh: 'Pure minimax, no learning. Try to win — you can\'t. The best you can get is a draw.',
     } as Record<string, string>,
   },
@@ -108,7 +110,7 @@ export const strings = {
       mlh:
         'You against the Q-learning agent. Each finished game becomes training data: ' +
         'it shifts its value estimates toward the moves that worked. Teaching by hand is ' +
-        'slow, though — for real progress, train it in mode 3.',
+        'slow, though — for real progress, train it in the ML vs ML mode.',
       mmml:
         'Train the agent against a perfect minimax opponent. «Train» runs hundreds of ' +
         'games instantly and feeds every result back into the table; «Play 1» steps through ' +

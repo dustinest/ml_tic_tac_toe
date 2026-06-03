@@ -10,7 +10,7 @@ export const strings = {
     agentMetaSeed: 'agent: 0 states · 0 games',
     modeButtons: [
       { mode: 'mlh', n: '1', label: 'ML vs human · learns' },
-      { mode: 'mlml', n: '2', label: 'ML vs ML · self-play' },
+      { mode: 'mlml', n: '2', label: 'ML vs ML · learns' },
       { mode: 'mmml', n: '3', label: 'minimax vs ML · learns' },
       { mode: 'mh', n: '4', label: 'minimax vs human' },
     ],

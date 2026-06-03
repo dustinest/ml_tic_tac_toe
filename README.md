@@ -16,10 +16,10 @@ Tic-tac-toe is just the playground small enough to **watch the difference** —
 train the learner, race it against perfect play, and inspect exactly what it
 figured out. Four modes:
 
-1. **minimax vs human** — pure minimax, no learning.
-2. **ML vs human · learns** — the agent learns from your games.
+1. **ML vs human · learns** — the agent learns from your games.
+2. **ML vs ML · learns** — two agents share one Q-table and learn against each other.
 3. **minimax vs ML · learns** — fast training against perfect play; sides alternate.
-4. **ML vs ML · self-play** — two agents share one Q-table and learn against each other.
+4. **minimax vs human** — pure minimax, no learning.
 
 Each training mode supports "Train N games" (instant) and "Play 1 (watch)"
 (animated). A learning-curve chart and a Q-table inspector (with JSON export)

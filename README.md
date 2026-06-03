@@ -40,8 +40,12 @@ Modular, interface-driven TypeScript:
   and self-play helpers.
 - `stats/` — sliding-window (last 100) win/draw/loss rates and the chart series.
 - `i18n/` — all user-facing strings in one place.
-- `view/` — thin DOM adapters (board, stats, chart, inspector, controls).
-- `app/` — composition root wiring modes → match runner → views.
+- `view/` — thin DOM adapters (board, stats, chart, inspector, controls) plus `layout.ts`, which
+  builds the page chrome from `i18n` strings.
+- `app/` — composition root: renders the layout, then wires modes → match runner → views.
+
+`index.html` is just a shell — `#app` plus the favicon, fonts, and a `<noscript>` fallback for
+visitors with JavaScript disabled. Everything else is rendered by the app from `i18n` strings.
 
 ## Develop
 

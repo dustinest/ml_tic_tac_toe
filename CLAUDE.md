@@ -51,11 +51,15 @@ See README.md for the full module tour. Key structural points that span files:
 - **Self-play shares one `QStore`.** In `mlml` mode both agents read/write the same store, so
   both sides' experience accumulates into a single Q-table.
 
-- **`app/index.ts` is the composition root** and the only file that touches the DOM directly
-  (via `view/` adapters). Modes: `mh` (minimax vs human), `mlh` (ML vs human, learns),
-  `mmml` (minimax vs ML, learns), `mlml` (ML self-play). It wires modes → match runner → views.
+- **`app/index.ts` is the composition root.** On startup it renders the static chrome via
+  `view/layout.ts` (which builds the markup from `i18n` strings into the `#app` shell in
+  `index.html`), then wires modes → match runner → views. It and the `view/` adapters are the
+  only code that touches the DOM. Modes: `mh` (minimax vs human), `mlh` (ML vs human, learns),
+  `mmml` (minimax vs ML, learns), `mlml` (ML self-play).
 
 - **All user-facing strings live in `i18n/en.ts`.** Add copy there, not inline in views or app.
+  `index.html` is a shell (`#app` + favicon + fonts) and holds no copy except the static
+  `<noscript>` fallback — the one string JS can't render, since it shows only when JS is off.
 
 ## Deploy
 

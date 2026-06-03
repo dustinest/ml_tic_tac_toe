@@ -282,7 +282,6 @@ textarea{
 .ns-head{font-family:'Big Shoulders Display',sans-serif;font-size:32px;font-weight:900;
   letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin-bottom:12px}
 .noscript p{color:var(--muted);font-size:12.5px;line-height:1.75}
-.noscript .x{color:var(--me);font-weight:700}
 
 /* ---------- focus & motion ---------- */
 :focus-visible{outline:3px solid var(--opp);outline-offset:2px}

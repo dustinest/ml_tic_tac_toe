@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tic-tac-toe // AI algorithm vs machine learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>TIC-<span class="x">TAC</span>-TOE</h1>
+      <div class="sub">AI algorithm &nbsp;//&nbsp; machine learning &nbsp;//&nbsp; minimax vs q-learning</div>
+    </div>
+    <div class="sub" id="agentmeta">agent: 0 states · 0 games</div>
+  </header>
+
+  <div class="modes">
+    <button data-mode="mlh" class="on"><span class="n">1</span>ML vs human · learns</button>
+    <button data-mode="mlml"><span class="n">2</span>ML vs ML · self-play</button>
+    <button data-mode="mmml"><span class="n">3</span>minimax vs ML · learns</button>
+    <button data-mode="mh"><span class="n">4</span>minimax vs human</button>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2><span id="boardtitle">Game</span></h2>
+      <div class="toggle hidden" id="startertoggle">
+        <button data-start="human" class="on">You start</button>
+        <button data-start="cpu">Computer starts</button>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="status" id="status"></div>
+      <div class="btnrow" id="controls"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div class="panel">
+        <h2>Learning result <span class="sub" id="metricnote"></span></h2>
+        <div class="stats">
+          <div class="stat win"><div class="v" id="sWin">0%</div><div class="l">Wins</div></div>
+          <div class="stat draw"><div class="v" id="sDraw">0%</div><div class="l">Draws</div></div>
+          <div class="stat loss"><div class="v" id="sLoss">0%</div><div class="l">Losses</div></div>
+        </div>
+        <div class="meta">
+          <span>Training games: <b id="mGames">0</b></span>
+          <span>States learned: <b id="mStates">0</b></span>
+          <span>Q-coverage: <b id="mFill">0</b></span>
+        </div>
+        <canvas id="chart" width="640" height="220"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--loss)"></i>loss %</span>
+          <span><i style="background:var(--draw)"></i>draw %</span>
+          <span><i style="background:var(--win)"></i>win %</span>
+          <span style="color:var(--dim)">window: last 100 games</span>
+        </div>
+        <div class="note" id="metricexplain"></div>
+      </div>
+
+      <div class="panel">
+        <h2>What the agent has learned
+          <span style="display:flex;gap:8px">
+            <button class="act" id="btnInspect" style="flex:0;padding:6px 11px">Show states</button>
+            <button class="act" id="btnExport" style="flex:0;padding:6px 11px">Export JSON</button>
+          </span>
+        </h2>
+        <div class="note">
+          Each square shows the agent's view: <span style="color:var(--me)">■ its mark</span>,
+          <span style="color:var(--opp)">■ opponent</span>, empty square shows the Q-value (higher = better move).
+          <span style="color:var(--win)">Green border</span> = the move the agent prefers. Sorted by visits.
+        </div>
+        <div class="insp hidden" id="inspector"></div>
+        <textarea id="exportbox" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

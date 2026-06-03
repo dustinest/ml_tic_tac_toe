@@ -1,5 +1,7 @@
 # tic-tac-toe — AI algorithm vs machine learning
 
+Demo is running at https://dustinest.github.io/ml_tic_tac_toe/
+
 A hands-on demo of **two fundamentally different ways to make a computer play a
 game**, shown side by side:
 

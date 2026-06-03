@@ -10,6 +10,12 @@ permissions:
   pages: write
   id-token: write
 
+# Force every bundled JS action onto Node 24. Covers the Pages actions
+# (configure-pages / upload-pages-artifact / deploy-pages) that have no
+# Node 24 release yet, silencing the Node 20 deprecation warning.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -18,10 +24,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm test

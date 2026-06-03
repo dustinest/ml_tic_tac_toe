@@ -8,11 +8,16 @@ export const strings = {
   layout: {
     title: 'tic-tac-toe // a perfect solver vs. a machine that learns',
     agentMetaSeed: 'agent: 0 states · 0 games',
+    // Legend for the actor icons used in the mode menu (human / minimax / ML).
+    actorsLabel: 'Players',
+    actors: { human: 'Human', minimax: 'minimax', ml: 'ML' } as Record<string, string>,
+    learnsTag: 'learns',
+    // Each mode is a matchup between two actors; the menu shows their icons.
     modeButtons: [
-      { mode: 'mlh', n: '1', label: 'ML vs human · learns' },
-      { mode: 'mlml', n: '2', label: 'ML vs ML · learns' },
-      { mode: 'mmml', n: '3', label: 'minimax vs ML · learns' },
-      { mode: 'mh', n: '4', label: 'minimax vs human' },
+      { mode: 'mlh', n: '1', a: 'ml', b: 'human', learns: true },
+      { mode: 'mlml', n: '2', a: 'ml', b: 'ml', learns: true },
+      { mode: 'mmml', n: '3', a: 'minimax', b: 'ml', learns: true },
+      { mode: 'mh', n: '4', a: 'minimax', b: 'human', learns: false },
     ],
     kickers: { play: 'Play', result: 'Result', memory: 'Memory' },
     panelTitles: {

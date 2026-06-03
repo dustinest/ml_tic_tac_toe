@@ -10,9 +10,37 @@ const LINKEDIN_ICON =
   '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="currentColor">' +
   '<path d="M13.63 0H2.37A2.34 2.34 0 0 0 0 2.31v11.38A2.34 2.34 0 0 0 2.37 16h11.26A2.34 2.34 0 0 0 16 13.69V2.31A2.34 2.34 0 0 0 13.63 0ZM4.86 13.12H2.9V6.37h1.96v6.75ZM3.88 5.5a1.14 1.14 0 1 1 0-2.28 1.14 1.14 0 0 1 0 2.28Zm9.24 7.62h-1.96V9.7c0-.83-.02-1.9-1.16-1.9-1.16 0-1.34.9-1.34 1.84v3.48H6.7V6.37h1.88v.92h.03c.26-.5.9-1.02 1.85-1.02 1.98 0 2.35 1.3 2.35 3v3.85Z"/></svg>';
 
+/** Geometric actor glyphs (human / minimax tree / ML learning-curve), defined
+ *  once and referenced by <use>. They inherit the button's text color. */
+const ICON_DEFS =
+  '<svg width="0" height="0" class="icon-defs" aria-hidden="true"><defs>' +
+  '<g id="i-human" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+  '<circle cx="8" cy="5.2" r="2.8"/><path d="M2.7 13.7c0-3 2.4-4.8 5.3-4.8s5.3 1.8 5.3 4.8"/></g>' +
+  '<g id="i-minimax"><g stroke="currentColor" stroke-width="1.7" fill="none"><path d="M8 4.2 4.6 9.6M8 4.2 11.4 9.6"/></g>' +
+  '<g fill="currentColor"><circle cx="8" cy="3.6" r="2"/><circle cx="4.4" cy="10.6" r="2"/><circle cx="11.6" cy="10.6" r="2"/></g></g>' +
+  '<g id="i-ml" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+  '<path d="M2.4 13 6 9.2 8.6 10.9 13.4 4"/><path d="M10.3 4 13.6 4 13.6 7.3"/></g>' +
+  '</defs></svg>';
+
+const icon = (kind: string) =>
+  `<span class="ico"><svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-${kind}"/></svg></span>`;
+
 const modeButtons = L.modeButtons
-  .map((b) => `<button data-mode="${b.mode}"><span class="n">${b.n}</span>${b.label}</button>`)
+  .map((b) => {
+    const aria = `${L.actors[b.a]} vs ${L.actors[b.b]}${b.learns ? ', learns' : ''}`;
+    const tag = b.learns ? `<em class="tag">${L.learnsTag}</em>` : '';
+    return `<button data-mode="${b.mode}" aria-label="${aria}">` +
+      `<span class="n">${b.n}</span>${icon(b.a)}<span class="vs">vs</span>${icon(b.b)}${tag}</button>`;
+  })
   .join('\n    ');
+
+const actorsLegend =
+  `<div class="actors-legend">
+    <span class="al-label">${L.actorsLabel}</span>
+    <span class="actor">${icon('human')} ${L.actors.human}</span>
+    <span class="actor">${icon('minimax')} ${L.actors.minimax}</span>
+    <span class="actor">${icon('ml')} ${L.actors.ml}</span>
+  </div>`;
 
 /**
  * Build the entire app markup from i18n copy and inject it into `root`.
@@ -22,6 +50,7 @@ const modeButtons = L.modeButtons
  */
 export function renderLayout(root: HTMLElement): void {
   root.innerHTML = `
+  ${ICON_DEFS}
   <header>
     <div class="masthead">
       <div class="flag" aria-hidden="true"><i class="b-x"></i><i class="b-o"></i><i class="b-a"></i></div>
@@ -32,6 +61,8 @@ export function renderLayout(root: HTMLElement): void {
     </div>
     <div class="meterchip"><span class="sub" id="agentmeta">${L.agentMetaSeed}</span></div>
   </header>
+
+  ${actorsLegend}
 
   <div class="modes" role="tablist">
     ${modeButtons}

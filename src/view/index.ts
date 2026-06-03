@@ -1,3 +1,4 @@
+export * from './layout';
 export * from './boardView';
 export * from './statsView';
 export * from './chartView';

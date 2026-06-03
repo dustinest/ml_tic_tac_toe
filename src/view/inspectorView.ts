@@ -12,7 +12,7 @@ export function renderInspector(el: HTMLElement, store: QStore): void {
   const keys = sortedStates(store);
   el.innerHTML = '';
   if (!keys.length) {
-    el.innerHTML = `<div class="note">${strings.inspector.empty}</div>`;
+    el.innerHTML = `<p class="note">${strings.inspector.empty}</p>`;
     return;
   }
   keys.slice(0, CAP).forEach((key) => {

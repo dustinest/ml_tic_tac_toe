@@ -16,10 +16,10 @@ Tic-tac-toe is just the playground small enough to **watch the difference** —
 train the learner, race it against perfect play, and inspect exactly what it
 figured out. Four modes:
 
-1. **minimax vs human** — pure minimax, no learning.
-2. **ML vs human · learns** — the agent learns from your games.
+1. **ML vs human · learns** — the agent learns from your games.
+2. **ML vs ML · learns** — two agents share one Q-table and learn against each other.
 3. **minimax vs ML · learns** — fast training against perfect play; sides alternate.
-4. **ML vs ML · self-play** — two agents share one Q-table and learn against each other.
+4. **minimax vs human** — pure minimax, no learning.
 
 Each training mode supports "Train N games" (instant) and "Play 1 (watch)"
 (animated). A learning-curve chart and a Q-table inspector (with JSON export)
@@ -40,8 +40,12 @@ Modular, interface-driven TypeScript:
   and self-play helpers.
 - `stats/` — sliding-window (last 100) win/draw/loss rates and the chart series.
 - `i18n/` — all user-facing strings in one place.
-- `view/` — thin DOM adapters (board, stats, chart, inspector, controls).
-- `app/` — composition root wiring modes → match runner → views.
+- `view/` — thin DOM adapters (board, stats, chart, inspector, controls) plus `layout.ts`, which
+  builds the page chrome from `i18n` strings.
+- `app/` — composition root: renders the layout, then wires modes → match runner → views.
+
+`index.html` is just a shell — `#app` plus the favicon, fonts, and a `<noscript>` fallback for
+visitors with JavaScript disabled. Everything else is rendered by the app from `i18n` strings.
 
 ## Develop
 

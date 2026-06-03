@@ -7,25 +7,33 @@ import { playMinimaxVsMl, playSelfPlay, resultFor } from '../match/training';
 import { strings } from '../i18n';
 import { AppState, type Mode } from './state';
 import {
-  BoardView, renderStats, drawChart, renderInspector, exportJson, buildControls,
+  renderLayout, BoardView, renderStats, drawChart, renderInspector, exportJson, buildControls,
 } from '../view';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function startApp(): void {
+  // Build the static chrome from i18n before anything queries the DOM.
+  document.title = strings.layout.title;
+  renderLayout($('app'));
+
   const s = new AppState();
 
   const els = {
     board: $('board'), status: $('status'), controls: $('controls'),
     boardTitle: $('boardtitle'), starterToggle: $('startertoggle'),
+    tagline: $('tagline'), boardDesc: $('boarddesc'), learnLine: $('learnline'),
+    learnDesc: $('learndesc'), inspDesc: $('inspdesc'),
     metricNote: $('metricnote'), metricExplain: $('metricexplain'),
     inspector: $('inspector'), exportBox: $('exportbox') as unknown as HTMLTextAreaElement,
+    inspectorPanel: $('inspectorpanel') as unknown as HTMLDetailsElement,
+    exportPanel: $('exportpanel') as unknown as HTMLDetailsElement,
+    btnCopy: $('btnCopy'),
     chart: $('chart') as unknown as HTMLCanvasElement,
     sWin: $('sWin'), sDraw: $('sDraw'), sLoss: $('sLoss'),
     mGames: $('mGames'), mStates: $('mStates'), mFill: $('mFill'),
     agentMeta: $('agentmeta'),
-    btnInspect: $('btnInspect'), btnExport: $('btnExport'),
   };
 
   const setStatus = (html: string) => { els.status.innerHTML = html; };
@@ -41,7 +49,7 @@ export function startApp(): void {
   function refreshAll(): void {
     renderStats(els, s.stats.currentRates(), s.agent.games, s.store.states().length);
     drawChart(els.chart, s.stats.chartPoints);
-    if (!els.inspector.classList.contains('hidden')) renderInspector(els.inspector, s.store);
+    if (els.inspectorPanel.open) renderInspector(els.inspector, s.store);
   }
 
   // ---- human games (mh / mlh) ----
@@ -180,6 +188,8 @@ export function startApp(): void {
   // ---- mode setup ----
   function setupMode(): void {
     els.boardTitle.textContent = strings.modeTitles[s.mode];
+    els.boardDesc.textContent = strings.descriptions.board[s.mode];
+    els.learnLine.classList.toggle('hidden', s.mode === 'mh'); // every mode but pure minimax learns
     els.starterToggle.classList.toggle('hidden', !s.isHumanMode());
     buildControls(els.controls, s.isHumanMode(), {
       train, watch, newGame, resetTraining,
@@ -190,41 +200,91 @@ export function startApp(): void {
 
   function resetTraining(): void {
     s.resetTraining();
-    els.exportBox.style.display = 'none';
+    els.exportPanel.open = false;
     refreshAll();
     newGame();
   }
 
   // ---- static wiring ----
-  document.querySelectorAll<HTMLButtonElement>('.modes button').forEach((b) => {
+  // The active button is derived from state, never stored in the markup, so
+  // AppState (mode / humanStarts) stays the single source of truth.
+  const modeButtons = document.querySelectorAll<HTMLButtonElement>('.modes button');
+  const starterButtons = els.starterToggle.querySelectorAll<HTMLButtonElement>('button');
+
+  function syncModeButtons(): void {
+    modeButtons.forEach((b) => {
+      const on = b.dataset.mode === s.mode;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', String(on));
+    });
+  }
+  function syncStarterButtons(): void {
+    starterButtons.forEach((b) => {
+      const on = (b.dataset.start === 'human') === s.humanStarts;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-checked', String(on));
+      b.tabIndex = on ? 0 : -1; // roving tabindex: only the checked radio is tabbable
+    });
+  }
+
+  modeButtons.forEach((b) => {
     b.addEventListener('click', () => {
-      document.querySelectorAll('.modes button').forEach((x) => x.classList.remove('on'));
-      b.classList.add('on');
       s.mode = b.dataset.mode as Mode;
+      syncModeButtons();
       setupMode();
     });
   });
-  els.starterToggle.querySelectorAll<HTMLButtonElement>('button').forEach((b) => {
+  starterButtons.forEach((b) => {
     b.addEventListener('click', () => {
-      els.starterToggle.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
-      b.classList.add('on');
       s.humanStarts = b.dataset.start === 'human';
+      syncStarterButtons();
       newGame();
     });
   });
-  els.btnInspect.onclick = () => {
-    els.inspector.classList.toggle('hidden');
-    const hidden = els.inspector.classList.contains('hidden');
-    els.btnInspect.textContent = hidden ? strings.inspector.show : strings.inspector.hide;
-    if (!hidden) renderInspector(els.inspector, s.store);
-  };
-  els.btnExport.onclick = () => {
-    if (els.exportBox.style.display === 'block') { els.exportBox.style.display = 'none'; return; }
-    els.exportBox.value = exportJson(s.store);
-    els.exportBox.style.display = 'block';
-  };
+  els.starterToggle.addEventListener('keydown', (e) => {
+    const keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
+    if (!keys.includes(e.key)) return;
+    e.preventDefault();
+    s.humanStarts = !s.humanStarts; // two options → any arrow flips
+    syncStarterButtons();
+    const checked = [...starterButtons].find((b) => b.tabIndex === 0);
+    checked?.focus();
+    newGame();
+  });
+  els.inspectorPanel.addEventListener('toggle', () => {
+    if (els.inspectorPanel.open) renderInspector(els.inspector, s.store);
+  });
+  els.exportPanel.addEventListener('toggle', () => {
+    if (els.exportPanel.open) els.exportBox.value = exportJson(s.store);
+  });
+  let copyTimer: number | undefined;
+  els.btnCopy.addEventListener('click', async () => {
+    const text = els.exportBox.value || exportJson(s.store);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // fall back for non-secure contexts where the clipboard API is blocked
+      els.exportBox.select();
+      document.execCommand('copy');
+      els.exportBox.setSelectionRange(0, 0);
+      els.exportBox.blur();
+    }
+    const label = els.btnCopy.querySelector('.copylabel');
+    if (label) label.textContent = strings.layout.actions.copied;
+    els.btnCopy.classList.add('copied');
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      if (label) label.textContent = strings.layout.actions.copy;
+      els.btnCopy.classList.remove('copied');
+    }, 1400);
+  });
 
   // ---- init ----
+  els.tagline.textContent = strings.tagline;
+  els.learnDesc.textContent = strings.descriptions.learning;
+  els.inspDesc.innerHTML = strings.descriptions.inspector;
+  syncModeButtons();
+  syncStarterButtons();
   setupMode();
   refreshAll();
 }

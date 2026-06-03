@@ -3,6 +3,32 @@ import type { Player } from '../game/types';
 const sym = (s: Player) => `<span class="${s}">${s}</span>`;
 
 export const strings = {
+  // Static chrome rendered by view/layout.ts. Kept here so every user-facing
+  // string lives in one place (see CLAUDE.md).
+  layout: {
+    title: 'tic-tac-toe // a perfect solver vs. a machine that learns',
+    agentMetaSeed: 'agent: 0 states · 0 games',
+    modeButtons: [
+      { mode: 'mlh', n: '1', label: 'ML vs human · learns' },
+      { mode: 'mlml', n: '2', label: 'ML vs ML · self-play' },
+      { mode: 'mmml', n: '3', label: 'minimax vs ML · learns' },
+      { mode: 'mh', n: '4', label: 'minimax vs human' },
+    ],
+    kickers: { play: 'Play', result: 'Result', memory: 'Memory' },
+    panelTitles: {
+      board: 'Game',
+      learning: 'Learning curve',
+      memory: 'What the agent has learned',
+    },
+    starter: { human: 'You start', cpu: 'Computer starts' },
+    stats: { wins: 'Wins', draws: 'Draws', losses: 'Losses' },
+    meta: { games: 'Training games', states: 'States learned', coverage: 'Q-coverage' },
+    legend: { loss: 'loss %', draw: 'draw %', win: 'win %', window: 'window: last 100 games' },
+    actions: { inspect: 'Show states', export: 'Export JSON' },
+    // The no-JavaScript fallback necessarily lives as static markup in
+    // index.html (JS can't render the page that exists when JS is off).
+  },
+
   modeTitles: {
     mh: 'minimax vs human',
     mlh: 'ML vs human',

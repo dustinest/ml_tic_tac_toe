@@ -7,13 +7,17 @@ import { playMinimaxVsMl, playSelfPlay, resultFor } from '../match/training';
 import { strings } from '../i18n';
 import { AppState, type Mode } from './state';
 import {
-  BoardView, renderStats, drawChart, renderInspector, exportJson, buildControls,
+  renderLayout, BoardView, renderStats, drawChart, renderInspector, exportJson, buildControls,
 } from '../view';
 
 const $ = (id: string) => document.getElementById(id) as HTMLElement;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function startApp(): void {
+  // Build the static chrome from i18n before anything queries the DOM.
+  document.title = strings.layout.title;
+  renderLayout($('app'));
+
   const s = new AppState();
 
   const els = {

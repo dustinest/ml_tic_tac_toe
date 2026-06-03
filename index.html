@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fallback title for the no-JS case; app overrides it from i18n on boot. -->
   <title>tic-tac-toe // a perfect solver vs. a machine that learns</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f2ecdd'/%3E%3Cg stroke='%231a1813' stroke-width='2.4' stroke-linecap='square'%3E%3Cline x1='11.5' y1='2.5' x2='11.5' y2='29.5'/%3E%3Cline x1='20.5' y1='2.5' x2='20.5' y2='29.5'/%3E%3Cline x1='2.5' y1='11.5' x2='29.5' y2='11.5'/%3E%3Cline x1='2.5' y1='20.5' x2='29.5' y2='20.5'/%3E%3C/g%3E%3Cg stroke='%23e0331b' stroke-width='2.7' stroke-linecap='round'%3E%3Cline x1='4.3' y1='4.3' x2='9.2' y2='9.2'/%3E%3Cline x1='9.2' y1='4.3' x2='4.3' y2='9.2'/%3E%3C/g%3E%3Ccircle cx='16' cy='16' r='3.2' fill='none' stroke='%231b3fc4' stroke-width='2.5'/%3E%3Cline x1='24' y1='24' x2='27.5' y2='27.5' stroke='%23e0331b' stroke-width='2.7' stroke-linecap='round'/%3E%3Cline x1='27.5' y1='24' x2='24' y2='27.5' stroke='%23e0331b' stroke-width='2.7' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,97 +11,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="masthead">
-      <div class="flag" aria-hidden="true"><i class="b-x"></i><i class="b-o"></i><i class="b-a"></i></div>
-      <div>
-        <h1>TIC<span class="dot">·</span><span class="x">TAC</span><span class="dot">·</span>TOE</h1>
-        <div class="sub" id="tagline"></div>
-      </div>
-    </div>
-    <div class="meterchip"><span class="sub" id="agentmeta">agent: 0 states · 0 games</span></div>
-  </header>
-
-  <div class="modes" role="tablist">
-    <button data-mode="mlh"><span class="n">1</span>ML vs human · learns</button>
-    <button data-mode="mlml"><span class="n">2</span>ML vs ML · self-play</button>
-    <button data-mode="mmml"><span class="n">3</span>minimax vs ML · learns</button>
-    <button data-mode="mh"><span class="n">4</span>minimax vs human</button>
+<!-- The entire UI is rendered into #app by view/layout.ts, with all copy
+     sourced from i18n. With JavaScript disabled, only the <noscript> shows. -->
+<div class="wrap" id="app"></div>
+<noscript>
+  <div class="noscript">
+    <pre class="ns-board">┌───┬───┬───┐
+│ X │ O │ X │
+├───┼───┼───┤
+│ O │ X │   │
+├───┼───┼───┤
+│   │   │ O │
+└───┴───┴───┘</pre>
+    <p class="ns-head">STALEMATE.</p>
+    <p>This little machine can’t think without JavaScript.</p>
+    <p>Switch it on — <span class="x">X</span> is waiting to make the first move.</p>
   </div>
-
-  <div class="grid">
-    <div class="panel panel--board">
-      <div class="phead">
-        <span class="kicker"><b>01</b> Play</span>
-        <h2 id="boardtitle">Game</h2>
-      </div>
-      <p class="panel-desc" id="boarddesc"></p>
-      <div class="toggle hidden" id="startertoggle">
-        <button data-start="human">You start</button>
-        <button data-start="cpu">Computer starts</button>
-      </div>
-      <div class="board" id="board"></div>
-      <div class="status" id="status"></div>
-      <div class="btnrow" id="controls"></div>
-    </div>
-
-    <div class="rail">
-      <div class="panel">
-        <div class="phead">
-          <span class="kicker"><b>02</b> Result</span>
-          <h2>Learning curve <span class="sub" id="metricnote"></span></h2>
-        </div>
-        <p class="panel-desc" id="learndesc"></p>
-        <div class="stats">
-          <div class="stat win"><div class="v" id="sWin">0%</div><div class="l">Wins</div></div>
-          <div class="stat draw"><div class="v" id="sDraw">0%</div><div class="l">Draws</div></div>
-          <div class="stat loss"><div class="v" id="sLoss">0%</div><div class="l">Losses</div></div>
-        </div>
-        <div class="meta">
-          <span>Training games <b id="mGames">0</b></span>
-          <span>States learned <b id="mStates">0</b></span>
-          <span>Q-coverage <b id="mFill">0</b></span>
-        </div>
-        <div class="chartwrap"><canvas id="chart" width="640" height="220"></canvas></div>
-        <div class="legend">
-          <span><i style="background:var(--loss)"></i>loss %</span>
-          <span><i style="background:var(--draw)"></i>draw %</span>
-          <span><i style="background:var(--win)"></i>win %</span>
-          <span class="legend-dim">window: last 100 games</span>
-        </div>
-        <div class="note" id="metricexplain"></div>
-      </div>
-
-      <div class="panel">
-        <div class="phead">
-          <span class="kicker"><b>03</b> Memory</span>
-          <h2>What the agent has learned</h2>
-          <span class="headacts">
-            <button class="act" id="btnInspect">Show states</button>
-            <button class="act" id="btnExport">Export JSON</button>
-          </span>
-        </div>
-        <p class="panel-desc" id="inspdesc"></p>
-        <div class="insp hidden" id="inspector"></div>
-        <textarea id="exportbox" readonly></textarea>
-      </div>
-    </div>
-  </div>
-
-  <footer class="colophon">
-    <div class="colo-links">
-      <a class="flink" href="https://github.com/dustinest/ml_tic_tac_toe" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-        GitHub
-      </a>
-      <a class="flink" href="https://www.linkedin.com/in/trapetsijuur/" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="currentColor"><path d="M13.63 0H2.37A2.34 2.34 0 0 0 0 2.31v11.38A2.34 2.34 0 0 0 2.37 16h11.26A2.34 2.34 0 0 0 16 13.69V2.31A2.34 2.34 0 0 0 13.63 0ZM4.86 13.12H2.9V6.37h1.96v6.75ZM3.88 5.5a1.14 1.14 0 1 1 0-2.28 1.14 1.14 0 0 1 0 2.28Zm9.24 7.62h-1.96V9.7c0-.83-.02-1.9-1.16-1.9-1.16 0-1.34.9-1.34 1.84v3.48H6.7V6.37h1.88v.92h.03c.26-.5.9-1.02 1.85-1.02 1.98 0 2.35 1.3 2.35 3v3.85Z"/></svg>
-        LinkedIn
-      </a>
-    </div>
-  </footer>
-</div>
+</noscript>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

@@ -274,6 +274,16 @@ textarea{
 
 .hidden{display:none!important}
 
+/* ---------- no-JavaScript fallback ---------- */
+.noscript{max-width:500px;margin:10vh auto 0;background:var(--paper);
+  border:3px solid var(--ink);box-shadow:var(--shadow);padding:32px 28px;text-align:center}
+.ns-board{font-family:'Space Mono',monospace;font-size:15px;line-height:1.15;
+  color:var(--ink);margin-bottom:22px;white-space:pre;display:inline-block}
+.ns-head{font-family:'Big Shoulders Display',sans-serif;font-size:32px;font-weight:900;
+  letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin-bottom:12px}
+.noscript p{color:var(--muted);font-size:12.5px;line-height:1.75}
+.noscript .x{color:var(--me);font-weight:700}
+
 /* ---------- focus & motion ---------- */
 :focus-visible{outline:3px solid var(--opp);outline-offset:2px}
 

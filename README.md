@@ -54,3 +54,8 @@ visitors with JavaScript disabled. Everything else is rendered by the app from `
     npm test           # Vitest (logic + orchestration; 46 tests)
     npm run build      # single-file dist/index.html
     npm run preview    # serve the built file
+
+## License
+
+MIT — free to use, modify and distribute, with **no warranty; use it at your
+own risk**. See [LICENSE](LICENSE).
